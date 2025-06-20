@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskItem from '@/components/molecules/TaskItem';
+import TaskDetailModal from '@/components/molecules/TaskDetailModal';
 import EmptyState from '@/components/molecules/EmptyState';
 
 const TaskList = ({ 
@@ -9,6 +11,8 @@ const TaskList = ({
   onTaskDelete,
   emptyStateProps = {}
 }) => {
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -21,7 +25,22 @@ const TaskList = ({
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+visible: { opacity: 1, y: 0 }
+  };
+
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  const handleTaskUpdate = (updatedTask) => {
+    onTaskUpdate(updatedTask);
+    setSelectedTask(updatedTask);
   };
 
   if (tasks.length === 0) {
@@ -35,7 +54,6 @@ const TaskList = ({
       />
     );
   }
-
   return (
     <motion.div
       variants={containerVariants}
@@ -51,15 +69,25 @@ const TaskList = ({
             layout
             exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
           >
-            <TaskItem
+<TaskItem
               task={task}
               categories={categories}
               onUpdate={onTaskUpdate}
               onDelete={onTaskDelete}
+              onTaskClick={handleTaskClick}
             />
           </motion.div>
         ))}
       </AnimatePresence>
+
+      {/* Task Detail Modal */}
+      <TaskDetailModal
+        task={selectedTask}
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onUpdate={handleTaskUpdate}
+        categories={categories}
+      />
     </motion.div>
   );
 };

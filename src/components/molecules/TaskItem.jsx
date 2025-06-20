@@ -7,7 +7,7 @@ import { taskService, categoryService } from '@/services';
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
 
-const TaskItem = ({ task, onUpdate, onDelete, categories = [] }) => {
+const TaskItem = ({ task, onUpdate, onDelete, onTaskClick, categories = [] }) => {
   const [isCompleting, setIsCompleting] = useState(false);
   const [taskCategory, setTaskCategory] = useState(null);
 
@@ -77,7 +77,17 @@ const TaskItem = ({ task, onUpdate, onDelete, categories = [] }) => {
     };
   };
 
-  const dueDateInfo = getDueDateInfo();
+const dueDateInfo = getDueDateInfo();
+
+  const handleTaskClick = (e) => {
+    // Prevent opening modal when clicking on interactive elements
+    if (e.target.closest('button') || e.target.closest('input')) {
+      return;
+    }
+    if (onTaskClick) {
+      onTaskClick(task);
+    }
+  };
 
   return (
     <motion.div
@@ -86,9 +96,10 @@ const TaskItem = ({ task, onUpdate, onDelete, categories = [] }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={`bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 ${
+      className={`bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer ${
         task.completed ? 'opacity-60' : ''
       }`}
+      onClick={handleTaskClick}
     >
       <div className="flex items-start gap-3">
         {/* Checkbox */}
